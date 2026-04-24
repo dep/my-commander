@@ -4,12 +4,17 @@ import AppKit
 @main
 struct MyCommanderApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    @StateObject private var updater = UpdaterViewModel()
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .frame(minWidth: 900, minHeight: 500)
-                .preferredColorScheme(.dark)
+            VStack(spacing: 0) {
+                UpdateBanner(updater: updater)
+                ContentView()
+            }
+            .frame(minWidth: 900, minHeight: 500)
+            .preferredColorScheme(.dark)
+            .onAppear { updater.checkInBackground() }
         }
         .windowStyle(.titleBar)
         .windowToolbarStyle(.unified(showsTitle: true))

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <channel>
+        <title>MyCommander</title>
+        <link>https://raw.githubusercontent.com/dep/my-commander/main/appcast.xml</link>
+        <description>Most recent changes to MyCommander</description>
+        <language>en</language>
+        <item>
+            <title>Version 0.1.4</title>
+            <pubDate>Fri, 24 Apr 2026 19:43:34 +0000</pubDate>
+            <sparkle:version>5</sparkle:version>
+            <sparkle:shortVersionString>0.1.4</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+                <ul>
+                    <li>Added Sparkle-based auto-updates with an in-app update banner.</li>
+                </ul>
+            ]]></description>
+            <enclosure url="https://github.com/dep/my-commander/releases/download/0.1.4/MyCommander-0.1.4.dmg"
+                       sparkle:edSignature="eLoCz1XhxrB1dVJksEfgSFb8DX/n3lc973tMToG4vyv+RLyCsvoZBb2B3/Qcc22dVLzDMC4hwuyvh8k7fthcCQ=="
+                       length="2151002"
+                       type="application/octet-stream" />
+        </item>
+    </channel>
+</rss>
