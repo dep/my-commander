@@ -3,7 +3,7 @@
 A sleek, keyboard-driven dual-pane file manager for macOS. Dark-theme friendly.
 Inspired by classics like Norton Commander and Midnight Commander.
 
-<img width="1476" height="1065" alt="image" src="https://github.com/user-attachments/assets/e2aab0c1-fd84-490e-81ef-9a3ece13eba2" />
+<img width="1353" height="987" alt="CleanShot 2026-04-24 at 15 30 48" src="https://github.com/user-attachments/assets/a5cd0065-5cc7-4fa1-9ce5-b1be26e5a5e6" />
 
 
 ## Download
