@@ -33,6 +33,8 @@ final class PaneModel: ObservableObject {
     @Published var cursor: URL?                  // focused row
     @Published var sortKey: SortKey = .name
     @Published var sortAscending: Bool = true
+    /// Anchor URL for shift-selection. nil until a shift-arrow press starts a range.
+    var shiftAnchor: URL?
 
     init(directory: URL) {
         self.directory = directory
@@ -160,6 +162,39 @@ final class PaneModel: ObservableObject {
         let idx = entries.firstIndex(where: { $0.url == cursor }) ?? -1
         let next = max(0, min(entries.count - 1, idx + delta))
         cursor = entries[next].url
+    }
+
+    /// Moves cursor by delta and extends the selection from the shift anchor
+    /// to the new cursor position. Parent ".." row is never selected.
+    func moveCursorExtending(delta: Int) {
+        guard !entries.isEmpty else { return }
+        if shiftAnchor == nil { shiftAnchor = cursor }
+        moveCursor(delta: delta)
+        applyShiftSelection()
+    }
+
+    func moveCursorExtendingToFirst() {
+        guard !entries.isEmpty else { return }
+        if shiftAnchor == nil { shiftAnchor = cursor }
+        moveCursorToFirst()
+        applyShiftSelection()
+    }
+
+    func moveCursorExtendingToLast() {
+        guard !entries.isEmpty else { return }
+        if shiftAnchor == nil { shiftAnchor = cursor }
+        moveCursorToLast()
+        applyShiftSelection()
+    }
+
+    private func applyShiftSelection() {
+        guard let anchor = shiftAnchor, let cur = cursor,
+              let aIdx = entries.firstIndex(where: { $0.url == anchor }),
+              let cIdx = entries.firstIndex(where: { $0.url == cur })
+        else { return }
+        let (lo, hi) = aIdx <= cIdx ? (aIdx, cIdx) : (cIdx, aIdx)
+        let range = entries[lo...hi].filter { !$0.isParent }.map { $0.url }
+        selection = Set(range)
     }
 
     func moveCursorToFirst() {

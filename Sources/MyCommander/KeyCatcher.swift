@@ -4,7 +4,8 @@ import Carbon.HIToolbox
 
 struct KeyEvent {
     let keyCode: UInt16
-    let characters: String
+    let characters: String           // shift-aware (e.g. "?" for Shift+/)
+    let charactersIgnoringShift: String
     let modifiers: NSEvent.ModifierFlags
 }
 
@@ -33,7 +34,8 @@ struct KeyCatcher: NSViewRepresentable {
                 monitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
                     guard let self = self, self.window?.isKeyWindow == true else { return event }
                     let ke = KeyEvent(keyCode: event.keyCode,
-                                      characters: event.charactersIgnoringModifiers ?? "",
+                                      characters: event.characters ?? "",
+                                      charactersIgnoringShift: event.charactersIgnoringModifiers ?? "",
                                       modifiers: event.modifierFlags)
                     if self.onKey?(ke) == true { return nil }
                     return event
@@ -70,4 +72,7 @@ enum Keys {
     static let home: UInt16     = UInt16(kVK_Home)
     static let end: UInt16      = UInt16(kVK_End)
     static let d: UInt16        = UInt16(kVK_ANSI_D)
+    static let g: UInt16        = UInt16(kVK_ANSI_G)
+    static let pageUp: UInt16   = UInt16(kVK_PageUp)
+    static let pageDown: UInt16 = UInt16(kVK_PageDown)
 }

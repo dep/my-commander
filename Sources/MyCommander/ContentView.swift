@@ -9,6 +9,8 @@ struct ContentView: View {
     @StateObject private var favorites = FavoritesStore()
     @State private var active: ActivePane = .left
     @State private var showFavorites = false
+    @State private var showHelp = false
+    @State private var showGoTo = false
 
     // prompt state
     @State private var prompt: PromptKind?
@@ -19,6 +21,7 @@ struct ContentView: View {
     @State private var typeAhead: String = ""
     @State private var typeAheadExpires: Date = .distantPast
     private let typeAheadTTL: TimeInterval = 1.0
+    private let pageSize: Int = 20
 
     enum PromptKind: Identifiable {
         case rename(URL)
@@ -77,6 +80,39 @@ struct ContentView: View {
                     .shadow(radius: 20)
             }
 
+            if showHelp {
+                Color.black.opacity(0.35)
+                    .ignoresSafeArea()
+                    .onTapGesture { showHelp = false }
+                HelpView(onDismiss: { showHelp = false })
+                    .background(Color(nsColor: .windowBackgroundColor))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color.white.opacity(0.12), lineWidth: 1)
+                    )
+                    .shadow(radius: 20)
+            }
+
+            if showGoTo {
+                Color.black.opacity(0.35)
+                    .ignoresSafeArea()
+                    .onTapGesture { showGoTo = false }
+                GoToView(currentDirectory: activeModel.directory,
+                         onGo: { url in
+                             activeModel.navigate(to: url)
+                             showGoTo = false
+                         },
+                         onDismiss: { showGoTo = false })
+                    .background(Color(nsColor: .windowBackgroundColor))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color.white.opacity(0.12), lineWidth: 1)
+                    )
+                    .shadow(radius: 20)
+            }
+
             if !typeAhead.isEmpty {
                 VStack {
                     Spacer()
@@ -113,7 +149,17 @@ struct ContentView: View {
     // MARK: - Key handling
 
     private func handleKey(_ e: KeyEvent) -> Bool {
-        if prompt != nil || showFavorites { return false }  // let the sheet handle input
+        if prompt != nil || showFavorites || showHelp || showGoTo { return false }  // let the sheet handle input
+
+        // "?" opens help (no command/option/control modifiers; shift is fine)
+        if e.characters == "?",
+           !e.modifiers.contains(.command),
+           !e.modifiers.contains(.option),
+           !e.modifiers.contains(.control) {
+            typeAhead = ""
+            showHelp = true
+            return true
+        }
 
         // expire stale type-ahead buffer
         if Date() > typeAheadExpires { typeAhead = "" }
@@ -142,6 +188,9 @@ struct ContentView: View {
                 let srcs = activeModel.actionTargets()
                 if !srcs.isEmpty { prompt = .confirmDelete(sources: srcs) }
                 return true
+            case Keys.g:
+                showGoTo = true
+                return true
             default:
                 return false
             }
@@ -157,6 +206,33 @@ struct ContentView: View {
             case Keys.three: activeModel.setSort(.date); return true
             case Keys.d: showFavorites = true; return true
             default: return false
+            }
+        }
+
+        // Shift-navigation extends selection (no other non-shift modifiers)
+        let nonShiftMods = e.modifiers.intersection([.command, .option, .control])
+        if nonShiftMods.isEmpty, e.modifiers.contains(.shift) {
+            switch e.keyCode {
+            case Keys.up:
+                typeAhead = ""
+                activeModel.moveCursorExtending(delta: -1); return true
+            case Keys.down:
+                typeAhead = ""
+                activeModel.moveCursorExtending(delta: 1); return true
+            case Keys.pageUp:
+                typeAhead = ""
+                activeModel.moveCursorExtending(delta: -pageSize); return true
+            case Keys.pageDown:
+                typeAhead = ""
+                activeModel.moveCursorExtending(delta: pageSize); return true
+            case Keys.home:
+                typeAhead = ""
+                activeModel.moveCursorExtendingToFirst(); return true
+            case Keys.end:
+                typeAhead = ""
+                activeModel.moveCursorExtendingToLast(); return true
+            default:
+                break
             }
         }
 
@@ -178,21 +254,26 @@ struct ContentView: View {
             }
             if let c = activeModel.cursor {
                 activeModel.toggleSelect(c)
-                activeModel.moveCursor(delta: 1)
             }
             return true
         case Keys.up:
-            typeAhead = ""
+            typeAhead = ""; activeModel.shiftAnchor = nil
             activeModel.moveCursor(delta: -1); return true
         case Keys.down:
-            typeAhead = ""
+            typeAhead = ""; activeModel.shiftAnchor = nil
             activeModel.moveCursor(delta: 1); return true
         case Keys.home:
-            typeAhead = ""
+            typeAhead = ""; activeModel.shiftAnchor = nil
             activeModel.moveCursorToFirst(); return true
         case Keys.end:
-            typeAhead = ""
+            typeAhead = ""; activeModel.shiftAnchor = nil
             activeModel.moveCursorToLast(); return true
+        case Keys.pageUp:
+            typeAhead = ""; activeModel.shiftAnchor = nil
+            activeModel.moveCursor(delta: -pageSize); return true
+        case Keys.pageDown:
+            typeAhead = ""; activeModel.shiftAnchor = nil
+            activeModel.moveCursor(delta: pageSize); return true
         case Keys.enter:
             typeAhead = ""
             if let c = activeModel.cursor,
