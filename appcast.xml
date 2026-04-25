@@ -6,6 +6,22 @@
         <description>Most recent changes to MyCommander</description>
         <language>en</language>
         <item>
+            <title>Version 0.1.5</title>
+            <pubDate>Sat, 25 Apr 2026 09:21:30 +0000</pubDate>
+            <sparkle:version>6</sparkle:version>
+            <sparkle:shortVersionString>0.1.5</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+                <ul>
+                    <li>F3: Quick file viewer for images, video, audio, and text. Navigate files with ↑/↓, dismiss with Esc.</li>
+                </ul>
+            ]]></description>
+            <enclosure url="https://github.com/dep/my-commander/releases/download/0.1.5/MyCommander-0.1.5.dmg"
+                       sparkle:edSignature="rX8dOseVbFW7XwCL1qzQdjFro4He1Apq8HETRnHlcHgDOvqrNAvvq+BRmZLo3AB7HNsWyrWJeKeGZPq/9Y3tAA=="
+                       length="2156924"
+                       type="application/octet-stream" />
+        </item>
+        <item>
             <title>Version 0.1.4</title>
             <pubDate>Fri, 24 Apr 2026 19:43:34 +0000</pubDate>
             <sparkle:version>5</sparkle:version>
