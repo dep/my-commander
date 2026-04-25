@@ -20,6 +20,7 @@ struct HelpView: View {
                         ("⌘←",               "Open target directory in left pane"),
                         ("⌘→",               "Open target directory in right pane"),
                         ("⌘G",               "Go to folder by path"),
+                        ("Ctrl+R",           "Reload both panes from disk"),
                     ])
                     section("Selection", rows: [
                         ("Space",            "Toggle selection on cursor row"),

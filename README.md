@@ -18,7 +18,7 @@ Requires Xcode command-line tools and macOS 14+.
 ./run.sh
 ```
 
-The script compiles a release binary, drops it into `MyCommander.app/Contents/MacOS/`,
+The script compiles a release binary, drops it into `My Commander.app/Contents/MacOS/`,
 and launches the app. You can also `swift run` directly for development.
 
 ## Keyboard Shortcuts
@@ -38,6 +38,7 @@ Press `?` inside the app at any time to see this same list as an in-app modal.
 | `⌘←` | Open cursor directory in left pane |
 | `⌘→` | Open cursor directory in right pane |
 | `⌘G` | Go to folder by path (supports `~`, absolute, relative; Tab completes) |
+| `Ctrl+R` | Reload both panes from disk |
 
 ### Selection
 | Key | Action |
@@ -104,10 +105,10 @@ Favorites are persisted to
 my-commander/
 ├── Package.swift
 ├── run.sh                         # build release + install + launch
-├── MyCommander.app/               # app bundle (Info.plist tracked, binary gitignored)
+├── My Commander.app/              # app bundle (Info.plist tracked, binary gitignored)
 │   └── Contents/
 │       ├── Info.plist
-│       └── MacOS/MyCommander      # compiled by run.sh
+│       └── MacOS/My Commander     # compiled by run.sh
 └── Sources/MyCommander/
     ├── App.swift                  # entry point + NSApplicationDelegate
     ├── ContentView.swift          # top-level layout + key dispatch
@@ -124,6 +125,6 @@ my-commander/
 
 - The app is unsigned. On first launch macOS Gatekeeper may block it;
   right-click the `.app` in Finder and choose **Open**, or run
-  `xattr -dr com.apple.quarantine MyCommander.app` and relaunch.
+  `xattr -dr com.apple.quarantine "My Commander.app"` and relaunch.
 - Copy/move operations are synchronous on the main thread — fine for
   typical usage, but large transfers will block the UI.

@@ -223,6 +223,7 @@ struct ContentView: View {
             case Keys.two:  activeModel.setSort(.size); return true
             case Keys.three: activeModel.setSort(.date); return true
             case Keys.d: showFavorites = true; return true
+            case Keys.r: left.reload(); right.reload(); return true
             default: return false
             }
         }

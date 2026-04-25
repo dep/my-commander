@@ -74,6 +74,7 @@ enum Keys {
     static let end: UInt16      = UInt16(kVK_End)
     static let d: UInt16        = UInt16(kVK_ANSI_D)
     static let g: UInt16        = UInt16(kVK_ANSI_G)
+    static let r: UInt16        = UInt16(kVK_ANSI_R)
     static let pageUp: UInt16   = UInt16(kVK_PageUp)
     static let pageDown: UInt16 = UInt16(kVK_PageDown)
 }

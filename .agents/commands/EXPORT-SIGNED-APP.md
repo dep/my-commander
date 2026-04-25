@@ -1,11 +1,20 @@
 <!-- Project-specific override. This file was auto-generated from agent-rules originally, -->
 <!-- but has been customized for my-commander's SPM + Sparkle setup. -->
 
-# Export Signed App (MyCommander)
+# Export Signed App (My Commander)
 
 ## Description
 
-Build, sign, notarize, and release a new version of MyCommander with Sparkle auto-update support.
+Build, sign, notarize, and release a new version of My Commander with Sparkle auto-update support.
+
+## Naming notes
+
+- App bundle: `My Commander.app` (with a space)
+- Bundle executable inside the app: `My Commander` (with a space) — must match `CFBundleExecutable` in `Info.plist`
+- SPM build product: `.build/release/MyCommander` (no space) — Swift target name is still `MyCommander`
+- DMG filename: `MyCommander-<version>.dmg` (no space) — keeps download URLs ASCII and matches existing release assets
+
+The commands below quote `"My Commander.app"` everywhere because of the embedded space.
 
 ## Prerequisites
 
@@ -36,7 +45,7 @@ tar -xf sparkle.tar.xz
 
 ### 0. Bump the version
 
-Edit `MyCommander.app/Contents/Info.plist`:
+Edit `My Commander.app/Contents/Info.plist`:
 
 ```xml
 <key>CFBundleShortVersionString</key>
@@ -48,70 +57,75 @@ Edit `MyCommander.app/Contents/Info.plist`:
 ### 1. Build the release binary
 
 ```bash
+APP="My Commander.app"
 swift build -c release && \
-cp -f .build/release/MyCommander MyCommander.app/Contents/MacOS/MyCommander
+cp -f .build/release/MyCommander "$APP/Contents/MacOS/My Commander"
 ```
 
 ### 2. Embed Sparkle.framework
 
 ```bash
+APP="My Commander.app"
 BUILD_DIR=".build/arm64-apple-macosx/release"
 [ -d "$BUILD_DIR/Sparkle.framework" ] || BUILD_DIR=".build/release"
-mkdir -p MyCommander.app/Contents/Frameworks
-rm -rf MyCommander.app/Contents/Frameworks/Sparkle.framework
-cp -R "$BUILD_DIR/Sparkle.framework" MyCommander.app/Contents/Frameworks/
-install_name_tool -add_rpath "@executable_path/../Frameworks" MyCommander.app/Contents/MacOS/MyCommander 2>/dev/null || true
+mkdir -p "$APP/Contents/Frameworks"
+rm -rf "$APP/Contents/Frameworks/Sparkle.framework"
+cp -R "$BUILD_DIR/Sparkle.framework" "$APP/Contents/Frameworks/"
+install_name_tool -add_rpath "@executable_path/../Frameworks" "$APP/Contents/MacOS/My Commander" 2>/dev/null || true
 ```
 
 ### 3. Sign (Sparkle framework first, then app)
 
 ```bash
+APP="My Commander.app"
 IDENTITY="Developer ID Application: Danny Peck (299R8V27FZ)"
 
 # Sign Sparkle's XPC helpers and framework first (inside-out signing required)
 codesign --force --timestamp --options runtime --sign "$IDENTITY" \
-  MyCommander.app/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Installer.xpc 2>/dev/null || true
+  "$APP/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Installer.xpc" 2>/dev/null || true
 codesign --force --timestamp --options runtime --sign "$IDENTITY" \
-  MyCommander.app/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Downloader.xpc 2>/dev/null || true
+  "$APP/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices/Downloader.xpc" 2>/dev/null || true
 codesign --force --timestamp --options runtime --sign "$IDENTITY" \
-  MyCommander.app/Contents/Frameworks/Sparkle.framework/Versions/B/Autoupdate 2>/dev/null || true
+  "$APP/Contents/Frameworks/Sparkle.framework/Versions/B/Autoupdate" 2>/dev/null || true
 codesign --force --timestamp --options runtime --sign "$IDENTITY" \
-  MyCommander.app/Contents/Frameworks/Sparkle.framework/Versions/B/Updater.app 2>/dev/null || true
+  "$APP/Contents/Frameworks/Sparkle.framework/Versions/B/Updater.app" 2>/dev/null || true
 codesign --force --timestamp --options runtime --sign "$IDENTITY" \
-  MyCommander.app/Contents/Frameworks/Sparkle.framework
+  "$APP/Contents/Frameworks/Sparkle.framework"
 
 # Now sign the app itself
 codesign --force --deep --timestamp --options runtime \
   --entitlements MyCommander.entitlements \
   --sign "$IDENTITY" \
-  MyCommander.app
+  "$APP"
 
-codesign --verify --deep --strict --verbose=2 MyCommander.app
+codesign --verify --deep --strict --verbose=2 "$APP"
 ```
 
 ### 4. Notarize + staple
 
 ```bash
+APP="My Commander.app"
 rm -f /tmp/MyCommander-notarize.zip && \
-ditto -c -k --keepParent MyCommander.app /tmp/MyCommander-notarize.zip && \
+ditto -c -k --keepParent "$APP" /tmp/MyCommander-notarize.zip && \
 xcrun notarytool submit /tmp/MyCommander-notarize.zip --keychain-profile "notarytool" --wait && \
-xcrun stapler staple MyCommander.app && \
-spctl --assess --type execute --verbose MyCommander.app
+xcrun stapler staple "$APP" && \
+spctl --assess --type execute --verbose "$APP"
 ```
 
 ### 5. Package as DMG
 
-Replace `<version>` with the new version (e.g. `0.1.3`):
+Replace `<version>` with the new version (e.g. `0.1.7`). The DMG filename keeps the no-space form for URL-friendliness.
 
 ```bash
+APP="My Commander.app"
 rm -rf /tmp/MyCommander-dmg-src && mkdir -p /tmp/MyCommander-dmg-src && \
-cp -R MyCommander.app /tmp/MyCommander-dmg-src/ && \
+cp -R "$APP" /tmp/MyCommander-dmg-src/ && \
 rm -f ~/Desktop/MyCommander-<version>.dmg && \
 create-dmg \
-  --volname "MyCommander" \
-  --volicon "/tmp/MyCommander-dmg-src/MyCommander.app/Contents/Resources/MyCommander.icns" \
+  --volname "My Commander" \
+  --volicon "/tmp/MyCommander-dmg-src/My Commander.app/Contents/Resources/MyCommander.icns" \
   --window-pos 200 120 --window-size 660 400 --icon-size 160 \
-  --icon "MyCommander.app" 180 170 --hide-extension "MyCommander.app" \
+  --icon "My Commander.app" 180 170 --hide-extension "My Commander.app" \
   --app-drop-link 480 170 \
   ~/Desktop/MyCommander-<version>.dmg \
   /tmp/MyCommander-dmg-src/
@@ -150,9 +164,9 @@ Use `date -u "+%a, %d %b %Y %H:%M:%S +0000"` for `pubDate`.
 ### 8. Commit, push, release
 
 ```bash
-git add MyCommander.app/Contents/Info.plist \
-        MyCommander.app/Contents/CodeResources \
-        MyCommander.app/Contents/_CodeSignature/ \
+git add "My Commander.app/Contents/Info.plist" \
+        "My Commander.app/Contents/CodeResources" \
+        "My Commander.app/Contents/_CodeSignature/" \
         appcast.xml && \
 git commit -m "bump version to <version>" && \
 git push
@@ -171,7 +185,7 @@ gh release upload <version> ~/Desktop/MyCommander-<version>.dmg
 
 ## Artifacts
 
-- Notarized app: `MyCommander.app` (in-repo)
+- Notarized app: `My Commander.app` (in-repo)
 - DMG: `~/Desktop/MyCommander-<version>.dmg`
 - Appcast: `appcast.xml` (committed to main)
 - GitHub release with DMG attached
