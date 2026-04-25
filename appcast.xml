@@ -6,6 +6,23 @@
         <description>Most recent changes to My Commander</description>
         <language>en</language>
         <item>
+            <title>Version 0.1.7</title>
+            <pubDate>Sat, 25 Apr 2026 12:46:49 +0000</pubDate>
+            <sparkle:version>8</sparkle:version>
+            <sparkle:shortVersionString>0.1.7</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+                <ul>
+                    <li>Renamed app bundle to "My Commander" (with a space).</li>
+                    <li>Ctrl+R reloads both panes from disk.</li>
+                </ul>
+            ]]></description>
+            <enclosure url="https://github.com/dep/my-commander/releases/download/0.1.7/MyCommander-0.1.7.dmg"
+                       sparkle:edSignature="V45dP2gif+qW8uarRGfvdRSKie34txJmjcUpTxfpP+RGJAXxNaTnVrysSx5tuqTJzM2HGePd9BaFwdyz/1hpAA=="
+                       length="2183344"
+                       type="application/octet-stream" />
+        </item>
+        <item>
             <title>Version 0.1.6</title>
             <pubDate>Sat, 25 Apr 2026 09:45:01 +0000</pubDate>
             <sparkle:version>7</sparkle:version>
